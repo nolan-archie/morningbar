@@ -21,3 +21,4 @@ status.json
 *.log
 *.qslog
 *.core
+config/.~lock.*#
