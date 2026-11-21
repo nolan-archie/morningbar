@@ -35,8 +35,8 @@ class GeminiSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     enabled: bool = True
-    primary_model: str = "gemini-3.8-flash"
-    fallback_model: str = "gemini-3.5-flash-lite"
+    primary_model: str = "gemini-3.5-flash-lite"
+    fallback_model: str = "gemini-3.8-flash"
     batch_size: int = Field(default=50, ge=1, le=50)
     max_stories: int = Field(default=15, ge=1, le=15)
     max_per_category: int = Field(default=3, ge=1, le=15)
