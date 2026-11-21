@@ -1,0 +1,18 @@
+[
+  {
+    "paper": {
+      "id": "2611.00001",
+      "title": "Low-memory inference with quantized KV cache",
+      "summary": "This paper reduces the memory footprint of long-context model decoding through KV-cache quantization.",
+      "publishedAt": "2026-11-21T08:30:00.000Z"
+    }
+  },
+  {
+    "paper": {
+      "id": "2611.00002",
+      "title": "An unrelated computer vision benchmark",
+      "summary": "A benchmark study for image classifiers.",
+      "publishedAt": "2026-11-21T08:35:00.000Z"
+    }
+  }
+]

@@ -1,0 +1,22 @@
+[settings]
+lookback_hours = 36
+shown_cooldown_hours = 72
+max_candidates = 150
+max_feed_items = 50
+max_body_bytes = 4000000
+request_interval_seconds = 1.0
+local_timezone = "Africa/Johannesburg"
+
+[[topics]]
+id = "ai_research"
+label = "AI research"
+weight = 5
+keywords = ["KV cache", "speculative decoding"]
+keyword_boosts = { "KV cache" = 2.0 }
+
+[[topics]]
+id = "linux"
+label = "Linux"
+weight = 5
+keywords = ["manual intervention"]
+manual_priority = true

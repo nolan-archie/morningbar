@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Saved research feed fixture</title>
+  <id>https://example.test/feed</id>
+  <updated>2026-11-21T09:00:00Z</updated>
+  <entry>
+    <title>Low-memory inference with a compact KV cache</title>
+    <link href="https://example.test/papers/kv-cache?utm_source=rss" />
+    <id>https://example.test/papers/kv-cache</id>
+    <updated>2026-11-21T08:30:00Z</updated>
+    <summary>We reduce memory use for long-context decoding.</summary>
+  </entry>
+  <entry>
+    <title>Speculative decoding for small local models</title>
+    <link href="https://example.test/papers/speculative" />
+    <id>https://example.test/papers/speculative</id>
+    <published>2026-11-20T17:15:00Z</published>
+    <summary><![CDATA[Draft tokens improve <b>generation speed</b>.]]></summary>
+  </entry>
+</feed>
