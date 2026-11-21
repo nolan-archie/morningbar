@@ -34,9 +34,104 @@ from .models import Story
 from .paths import Paths
 from .status import StatusWriter
 from .storage import Store
+from .topics import append_topic_to_config, build_topic_and_sources, slug_id, verify_sources
 from .trigger import TriggerLock, TriggerState, is_in_morning_window, wait_for_network
 
 app = typer.Typer(no_args_is_help=True, help="Local morning news briefing")
+topic_app = typer.Typer(no_args_is_help=True, help="Manage briefing topics")
+app.add_typer(topic_app, name="topic")
+
+
+@topic_app.command("add")
+def topic_add(
+    label: str = typer.Argument(..., help="Topic to propose, for example: robotics."),
+    config: Optional[Path] = typer.Option(None, "--config", help="Interests TOML (defaults to XDG config)."),
+) -> None:
+    """Ask Gemini for keywords and sources, verify them, then review before saving."""
+    clean_label = label.strip()
+    if not clean_label or len(clean_label) > 80 or any(ord(char) < 32 for char in clean_label):
+        typer.echo("Topic label must be 1–80 printable characters.", err=True)
+        raise typer.Exit(code=2)
+    topic_id = slug_id(clean_label)
+    if not topic_id:
+        typer.echo("Topic label needs at least one ASCII letter or number.", err=True)
+        raise typer.Exit(code=2)
+
+    paths = Paths.current()
+    config_path = (config or paths.interests_file).expanduser()
+    try:
+        interests = load_config(config_path)
+    except ValueError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=2) from exc
+    if any(topic.id == topic_id for topic in interests.topics):
+        typer.echo(f"Topic id {topic_id!r} already exists; no changes were made.", err=True)
+        raise typer.Exit(code=2)
+    if not interests.gemini.enabled:
+        typer.echo("Gemini is disabled in this interests config; no changes were made.", err=True)
+        raise typer.Exit(code=1)
+    if not resolve_api_key(paths.gemini_key_file):
+        typer.echo("No Gemini API key is available; no changes were made.", err=True)
+        raise typer.Exit(code=1)
+
+    paths.state_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+    store = Store(paths.database_file)
+    proposer = GeminiRanker(
+        interests.gemini,
+        paths.gemini_key_file,
+        interests.topics,
+        store,
+        None,
+    )
+    try:
+        proposal = asyncio.run(proposer.propose_topic(clean_label))
+    except Exception as exc:
+        logging.getLogger(__name__).warning("topic proposal failed (%s)", type(exc).__name__)
+        proposal = None
+    if proposal is None:
+        typer.echo("Gemini did not return a valid proposal; no changes were made.", err=True)
+        raise typer.Exit(code=1)
+
+    try:
+        topic, sources = build_topic_and_sources(clean_label, proposal, interests)
+    except (ValueError, ValidationError) as exc:
+        typer.echo(f"Proposal could not be used: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"Checking {len(sources)} proposed source URLs…")
+    try:
+        checks = asyncio.run(verify_sources(sources))
+    except Exception as exc:
+        logging.getLogger(__name__).warning("source verification failed (%s)", type(exc).__name__)
+        typer.echo("Source verification failed; no changes were made.", err=True)
+        raise typer.Exit(code=1) from exc
+    verified = [check.source for check in checks if check.ok]
+    for check in checks:
+        state = check.detail if check.ok else f"excluded: {check.detail}"
+        typer.echo(f"- {check.source.name}: {state}\n  {check.source.url}")
+    typer.echo(f"\nTopic: {topic.label} (weight {topic.weight}/5, id {topic.id})")
+    typer.echo("Keywords: " + ", ".join(topic.keywords))
+    if topic.keyword_boosts:
+        boosts = ", ".join(f"{key} +{value:g}" for key, value in topic.keyword_boosts.items())
+        typer.echo("Keyword boosts: " + boosts)
+    typer.echo(
+        f"Flags: manual_priority={str(topic.manual_priority).lower()}, "
+        f"news_only={str(topic.news_only).lower()}"
+    )
+    typer.echo(f"Verified sources to add: {len(verified)}")
+    if not verified:
+        typer.echo("No proposed sources passed verification; no changes were made.", err=True)
+        raise typer.Exit(code=1)
+    if not typer.confirm(f"Add this topic to {config_path}?", default=False):
+        typer.echo("No changes made.")
+        return
+    try:
+        append_topic_to_config(config_path, topic, verified)
+    except (OSError, RuntimeError, ValueError, ValidationError) as exc:
+        typer.echo(f"Could not update interests config: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    typer.echo(f"Added {topic.label} and {len(verified)} verified source(s) to {config_path}.")
+
+
 @app.command()
 def run(
     no_llm: bool = typer.Option(False, "--no-llm", help="Use local ranking only."),

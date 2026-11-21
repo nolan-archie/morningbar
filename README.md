@@ -58,6 +58,20 @@ The API key can instead be supplied through `GEMINI_API_KEY`, or kept in
 the API is offline, or the app-side usage caps are reached, the briefing uses
 local ranking and shows `basic` mode.
 
+Add a topic with one command:
+
+```sh
+morningbar topic add "robotics"
+```
+
+Gemini proposes a weight, keywords, and up to five public feed or page sources.
+Morning Bar checks each URL, checks `robots.txt` before page requests, and shows
+the full proposal. Only sources that pass verification are offered for saving;
+the config changes only if you confirm at the prompt. The request uses the
+configured Gemini model and local usage caps, and sends Gemini only the topic
+label you entered. The generated TOML remains editable in
+`~/.config/morningbar/interests.toml`.
+
 ```sh
 morningbar run --no-llm
 morningbar feedback STORY_ID --vote up

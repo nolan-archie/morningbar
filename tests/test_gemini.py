@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from morningbar.config import load_config
-from morningbar.gemini import GeminiRanker, resolve_api_key
+from morningbar.gemini import GeminiRanker, TopicProposalResponse, resolve_api_key
 from morningbar.models import Article, GeminiSettings, Story
 from morningbar.status import StatusWriter
 from morningbar.storage import Store
@@ -134,3 +134,56 @@ async def test_gemini_ranker_uses_json_schema_and_stateless_requests(
     assert [call["store"] for call in calls] == [False, False]
     assert all(call["response_format"]["mime_type"] == "application/json" for call in calls)
     assert store.gemini_usage_today()["requests"] == 2
+
+
+@pytest.mark.asyncio
+async def test_topic_proposal_uses_one_quota_count_and_does_not_touch_run_status(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls: list[dict] = []
+
+    class FakeInteractions:
+        def create(self, **kwargs):
+            calls.append(kwargs)
+            return SimpleNamespace(
+                output_text=json.dumps({
+                    "weight": 4,
+                    "keywords": ["robotics", "robot arms", "autonomous robots"],
+                    "keyword_boosts": {"robot arms": 1.5},
+                    "manual_priority": False,
+                    "news_only": False,
+                    "sources": [{
+                        "name": "Robotics News",
+                        "url": "https://robotics.example/feed.xml",
+                        "kind": "feed",
+                        "trust": 3,
+                        "max_items": 30,
+                    }],
+                }),
+                usage=SimpleNamespace(total_input_tokens=100, total_output_tokens=80),
+            )
+
+    class FakeClient:
+        def __init__(self, **kwargs):
+            self.interactions = FakeInteractions()
+
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    monkeypatch.setattr("morningbar.gemini.genai.Client", FakeClient)
+    store = Store(tmp_path / "topic-proposal.sqlite3")
+    ranker = GeminiRanker(
+        GeminiSettings(minimum_request_interval_seconds=1),
+        tmp_path / "missing-key",
+        load_config(FIXTURES / "interests.toml").topics,
+        store,
+        None,
+    )
+
+    proposal = await ranker.propose_topic("robotics")
+
+    assert isinstance(proposal, TopicProposalResponse)
+    assert proposal.sources[0].name == "Robotics News"
+    assert calls[0]["store"] is False
+    assert "Propose a compact configuration" in calls[0]["system_instruction"]
+    assert "robotics" in calls[0]["input"]
+    assert store.gemini_usage_today()["requests"] == 1
+    assert not (tmp_path / "status.json").exists()
