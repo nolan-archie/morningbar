@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-21",
+  "generated_at": "2026-11-21T05:47:00+00:00",
+  "mode": "gemini",
+  "mode_reason": null,
+  "model": "preview",
+  "headline": "A calm sample briefing for the Morning Bar UI.",
+  "tldr": [
+    "Preview stories are examples for checking layout and interaction.",
+    "High priority Arch notices remain pinned above category limits.",
+    "The live briefing uses only the approved interests and feed results."
+  ],
+  "stories": [
+    {
+      "id": "preview_arch_manual_action",
+      "category_id": "linux",
+      "category": "Linux",
+      "title": "Arch Linux manual intervention notice needs a package migration",
+      "link": "https://archlinux.org/news/",
+      "source_names": ["Arch Linux News"],
+      "published_at": "2026-11-21T05:20:00+00:00",
+      "excerpt": "Preview text only. Open the official source to verify current instructions.",
+      "summary": "A package transition may require a one-time manual command before the next system update.",
+      "why_it_matters": "Manual Arch actions are always surfaced first so an update cannot quietly leave the system in a partial state.",
+      "importance": 10,
+      "local_score": 99.0,
+      "outlet_count": 1,
+      "manual_priority": true
+    },
+    {
+      "id": "preview_ai_memory",
+      "category_id": "ai_research",
+      "category": "AI research",
+      "title": "A new paper compares memory-saving attention methods on long contexts",
+      "link": "https://arxiv.org/list/cs.LG/recent",
+      "source_names": ["arXiv"],
+      "published_at": "2026-11-21T04:30:00+00:00",
+      "excerpt": "Preview text only. This story is not a live research result.",
+      "summary": "The paper measures cache size and inference quality across several efficient attention techniques.",
+      "why_it_matters": "Memory use is a key limit when running useful models on a laptop.",
+      "importance": 8,
+      "local_score": 52.0,
+      "outlet_count": 2,
+      "manual_priority": false
+    },
+    {
+      "id": "preview_kernel",
+      "category_id": "android_kernels",
+      "category": "Android & kernels",
+      "title": "KernelSU-Next adds a compatibility change to its latest release",
+      "link": "https://github.com/KernelSU-Next/KernelSU-Next/releases",
+      "source_names": ["GitHub Releases"],
+      "published_at": "2026-11-20T22:05:00+00:00",
+      "excerpt": "Preview text only. Check the upstream release notes before changing a device.",
+      "summary": "The release note describes a module API adjustment and lists the supported kernel range.",
+      "why_it_matters": "It may affect the root setup and compatibility checks you follow on Android.",
+      "importance": 6,
+      "local_score": 36.0,
+      "outlet_count": 1,
+      "manual_priority": false
+    },
+    {
+      "id": "preview_market",
+      "category_id": "markets",
+      "category": "Markets",
+      "title": "ECB and Federal Reserve speakers are on today's economic calendar",
+      "link": "https://www.ecb.europa.eu/press/calendars/html/index.en.html",
+      "source_names": ["Official calendars"],
+      "published_at": "2026-11-20T18:00:00+00:00",
+      "excerpt": "Preview text only. Calendar times and event details should be verified at the official source.",
+      "summary": "Several scheduled remarks could explain changes in yields and currency coverage today.",
+      "why_it_matters": "This gives context for the news affecting gold and EUR/USD without offering a trade signal.",
+      "importance": 5,
+      "local_score": 27.0,
+      "outlet_count": 1,
+      "manual_priority": false
+    }
+  ],
+  "candidate_count": 48,
+  "source_count": 65,
+  "unavailable_sources": 3
+}

@@ -1,0 +1,18 @@
+[Unit]
+Description=Morning Bar Quickshell pill and briefing card
+Documentation=file:///home/nolan-archie/Projects/morningbar/README.md
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/nolan-archie/Projects/morningbar/.venv/bin/morningbar ui
+Restart=no
+Nice=5
+IOSchedulingClass=idle
+CPUWeight=25
+CPUQuota=10%
+TimeoutStopSec=3
+StandardOutput=journal
+StandardError=journal
