@@ -34,7 +34,9 @@ detection. A first check records a baseline but does not create a story. Page
 deadlines remain unverified until the linked official notice confirms them.
 
 Gemini uses the official `google-genai` SDK with `gemini-3.5-flash-lite` first
-and `gemini-3.8-flash` as fallback. Model names and conservative
+and `gemini-3.8-flash` as fallback. Ranking requests contain at most 20 stories
+and use a 2,400-token output limit to keep structured responses complete.
+Transient HTTP 5xx responses are retried with backoff. Model names and
 app-side request/token caps are editable under `[gemini]` in the interests
 file. Google's actual limits vary by project and are shown in Google AI
 Studio; these local caps are safeguards, not provider quotas. Free-tier input

@@ -37,15 +37,15 @@ class GeminiSettings(BaseModel):
     enabled: bool = True
     primary_model: str = "gemini-3.5-flash-lite"
     fallback_model: str = "gemini-3.8-flash"
-    batch_size: int = Field(default=50, ge=1, le=50)
+    batch_size: int = Field(default=20, ge=1, le=50)
     max_stories: int = Field(default=15, ge=1, le=15)
     max_per_category: int = Field(default=3, ge=1, le=15)
-    max_requests_per_minute: int = Field(default=6, ge=1, le=60)
-    max_requests_per_run: int = Field(default=6, ge=1, le=20)
+    max_requests_per_minute: int = Field(default=8, ge=1, le=60)
+    max_requests_per_run: int = Field(default=8, ge=1, le=20)
     max_requests_per_day: int = Field(default=12, ge=1, le=1000)
-    max_tokens_per_minute: int = Field(default=30_000, ge=1_000, le=1_000_000)
-    max_tokens_per_day: int = Field(default=40_000, ge=1_000, le=10_000_000)
-    max_output_tokens: int = Field(default=3_500, ge=256, le=16_384)
+    max_tokens_per_minute: int = Field(default=40_000, ge=1_000, le=1_000_000)
+    max_tokens_per_day: int = Field(default=50_000, ge=1_000, le=10_000_000)
+    max_output_tokens: int = Field(default=2_400, ge=256, le=16_384)
     max_retries: int = Field(default=2, ge=0, le=5)
     retry_base_seconds: float = Field(default=1.0, ge=0.25, le=30.0)
     minimum_request_interval_seconds: float = Field(default=4.0, ge=1.0, le=60.0)

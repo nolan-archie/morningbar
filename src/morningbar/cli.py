@@ -313,6 +313,8 @@ def trigger(
             "ready", len(document.stories), len(document.stories),
             local_day=local_day, offline=offline, metered=network.metered,
             unavailable=unavailable, sources_checked=total,
+            mode=document.mode, mode_reason=document.mode_reason,
+            briefing_date=document.date,
         )
         if not ui_started and not _ui_dismissed(paths, local_day):
             _fallback_ui(paths, open_page=False)
